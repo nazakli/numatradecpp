@@ -4,7 +4,7 @@
 
 #ifndef MODE_H
 #define MODE_H
-enum Mode {
+enum InstrumentType {
     CASH=0, //Volume in lots * Contract size
     FOREX=1, //Volume in lots * Contract size / Leverage
     CFD=2, //Volume in lots * Contract size * Open market price

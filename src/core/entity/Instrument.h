@@ -6,12 +6,12 @@
 #define INSTRUMENT_H
 #include <string>
 
-#include "enum/Mode.h"
+#include "../enum/InstrumentType.h"
 
 struct Instrument {
     std::string code;
     std::string name;
-    Mode mode;
+    InstrumentType instrumentType;
     int digits;
 };
 #endif //INSTRUMENT_H

@@ -3,12 +3,12 @@
 #include <memory>
 #include <thread>
 
-#include "src/admin/Admin.h"
-#include "src/admin/data/Company.h"
-#include "src/admin/data/Instrument.h"
-#include "src/sys/Boot.h"
-#include "src/sys/Logger.h"
-#include "src/sys/NATSLogger.h"
+#include "src/app/AdminMan.h"
+#include "src/core/entity/Company.h"
+#include "src/core/entity/Instrument.h"
+#include "src/infra/Boot.h"
+#include "src/infra/Logger.h"
+#include "src/infra/NATSLogger.h"
 
 int main() {
     Logger::initialize();

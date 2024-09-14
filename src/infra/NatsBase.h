@@ -26,9 +26,9 @@ public:
     void pubBus(const std::string& subject, const std::string& message) const {
         try {
             bus.publish(subject, message);
-            std::cout << "Published message to subject: " << subject << std::endl;
+            std::cout << "NatsBase Published message to subject: " << subject << std::endl;
         } catch (const std::exception& e) {
-            std::cerr << "Failed to publish message: " << e.what() << std::endl;
+            std::cerr << "NatsBase Failed to publish message: " << e.what() << std::endl;
             throw;
         }
     }
@@ -43,9 +43,9 @@ public:
 
         natsStatus s = natsConnection_Subscribe(&(sub), bus.getConnection(), subject.c_str(), wrapper, &onMessage);
         if (s == NATS_OK) {
-            std::cout << "Subscribed to subject: " << subject << std::endl;
+            std::cout << "NatsBase Subscribed to subject: " << subject << std::endl;
         } else {
-            std::cerr << "Failed to subscribe: " << natsStatus_GetText(s) << std::endl;
+            std::cerr << "NatsBase Failed to subscribe: " << natsStatus_GetText(s) << std::endl;
         }
     }
 
@@ -56,14 +56,14 @@ public:
             natsStatus s = natsConnection_RequestString(&(replyMsg), bus.getConnection(), subject.c_str(), message.c_str(), timeout);
             if (s == NATS_OK) {
                 std::string replyData = natsMsg_GetData(replyMsg);
-                std::cout << "Received reply: " << replyData << std::endl;
+                std::cout << "NatsBase Received reply: " << replyData << std::endl;
                 // Callback fonksiyonu ile cevabı işle
                 onReply(replyData);
             } else {
-                std::cerr << "Request failed: " << natsStatus_GetText(s) << std::endl;
+                std::cerr << "NatsBase Request failed: " << natsStatus_GetText(s) << std::endl;
             }
         } catch (const std::exception& e) {
-            std::cerr << "Exception in request: " << e.what() << std::endl;
+            std::cerr << "NatsBase Exception in request: " << e.what() << std::endl;
             throw;
         }
         natsMsg_Destroy(replyMsg);
@@ -79,9 +79,9 @@ public:
 
         natsStatus s = natsConnection_Subscribe(&(sub), bus.getConnection(), subject.c_str(), wrapper, &onRequest);
         if (s == NATS_OK) {
-            std::cout << "Listening for requests on subject: " << subject << std::endl;
+            std::cout << "NatsBase Listening for requests on subject: " << subject << std::endl;
         } else {
-            std::cerr << "Failed to subscribe for requests: " << natsStatus_GetText(s) << std::endl;
+            std::cerr << "NatsBase Failed to subscribe for requests: " << natsStatus_GetText(s) << std::endl;
         }
     }
 };

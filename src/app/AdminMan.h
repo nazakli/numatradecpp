@@ -4,14 +4,14 @@
 
 #ifndef ADMIN_H
 #define ADMIN_H
-#include "data/Company.h"
-#include "../sys/Bus.h"
-#include "../sys/NatsBase.h"
+#include "../core/entity/Company.h"
+#include "../infra/Bus.h"
+#include "../infra/NatsBase.h"
 
-class Admin : public NatsBase {
+class AdminMan : public NatsBase {
     Company& company;
 public:
-    explicit Admin(Company& company) : company(company) {
+    explicit AdminMan(Company& company) : company(company) {
         pubBus("admin", "Admin is created.");
         IpcMsg msg("INFO", "{Admin is created.}");
         bool stat = pubIpc(msg);
