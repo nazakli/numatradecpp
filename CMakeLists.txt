@@ -14,13 +14,16 @@ add_executable(numatrade main.cpp
         src/sys/boot.h
         src/sys/Logger.h
         src/sys/NATSLogger.h
+        src/sys/Ipc.h
 
 )
+find_package(nng)
 find_package(spdlog)
 find_package(glaze)
 find_package(cnats)
 
 target_link_libraries(numatrade
+        nng::nng
         spdlog::spdlog
         glaze::glaze
         cnats::nats_static)

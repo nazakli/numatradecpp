@@ -12,8 +12,10 @@ class Admin : public NatsBase {
     Company& company;
 public:
     explicit Admin(Company& company) : company(company) {
-        publish("admin", "Admin is created.");
-        publish("company", company.code + " is created.");
+        pubBus("admin", "Admin is created.");
+        IpcMsg msg("INFO", "{Admin is created.}");
+        bool stat = pubIpc(msg);
+        pubBus("company", company.code + " is created.");
     }
     [[nodiscard]] Company& getCompany() const {
         return company;

@@ -2,6 +2,7 @@
 # To keep your changes, remove these comment lines, but the plugin won't be able to modify your requirements
 
 requirements:
+  - "nng/1.8.0"
   - "spdlog/1.14.1"
   - "glaze/3.3.2"
   - "cnats/3.8.0"

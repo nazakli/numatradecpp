@@ -4,9 +4,11 @@
 #include <iostream>
 #include <string>
 #include <nats/nats.h>
+#include <functional>
 #include "Bus.h"
+#include "Ipc.h"
 
-class NatsBase {
+class NatsBase : public IpcBase {
 protected:
     // Use the Bus singleton to access the NATS connection
     Bus& bus = Bus::getInstance();
@@ -21,14 +23,25 @@ public:
     }
 
     // Publish message to a subject
-    void publish(const std::string& subject, const std::string& message) const {
-        bus.publish(subject, message);
+    void pubBus(const std::string& subject, const std::string& message) const {
+        try {
+            bus.publish(subject, message);
+            std::cout << "Published message to subject: " << subject << std::endl;
+        } catch (const std::exception& e) {
+            std::cerr << "Failed to publish message: " << e.what() << std::endl;
+            throw;
+        }
     }
 
-    // Subscribe to a subject
-    void subscribe(const std::string& subject, natsMsgHandler onMessage, void* closure = nullptr) {
+    // Subscribe to a subject with flexible callback handling using std::function
+    void subBus(const std::string& subject, std::function<void(natsMsg*)> onMessage, void* closure = nullptr) {
         natsSubscription* sub = nullptr;
-        natsStatus s = natsConnection_Subscribe(&(sub), bus.getConnection(), subject.c_str(), onMessage, closure);
+        auto wrapper = [](natsConnection* nc, natsSubscription* sub, natsMsg* msg, void* closure) {
+            auto* handler = static_cast<std::function<void(natsMsg*)>*>(closure);
+            (*handler)(msg);
+        };
+
+        natsStatus s = natsConnection_Subscribe(&(sub), bus.getConnection(), subject.c_str(), wrapper, &onMessage);
         if (s == NATS_OK) {
             std::cout << "Subscribed to subject: " << subject << std::endl;
         } else {
@@ -36,22 +49,35 @@ public:
         }
     }
 
-    // Send a request and get a reply
-    void request(const std::string& subject, const std::string& message, int timeout = 5000) {
+    // Send a request and get a reply, processing the reply via callback
+    void reqBus(const std::string& subject, const std::string& message, std::function<void(const std::string&)> onReply, int timeout = 5000) {
         natsMsg* replyMsg = nullptr;
-        natsStatus s = natsConnection_RequestString(&(replyMsg), bus.getConnection(), subject.c_str(), message.c_str(), timeout);
-        if (s == NATS_OK) {
-            std::cout << "Received reply: " << natsMsg_GetData(replyMsg) << std::endl;
-        } else {
-            std::cerr << "Request failed: " << natsStatus_GetText(s) << std::endl;
+        try {
+            natsStatus s = natsConnection_RequestString(&(replyMsg), bus.getConnection(), subject.c_str(), message.c_str(), timeout);
+            if (s == NATS_OK) {
+                std::string replyData = natsMsg_GetData(replyMsg);
+                std::cout << "Received reply: " << replyData << std::endl;
+                // Callback fonksiyonu ile cevabı işle
+                onReply(replyData);
+            } else {
+                std::cerr << "Request failed: " << natsStatus_GetText(s) << std::endl;
+            }
+        } catch (const std::exception& e) {
+            std::cerr << "Exception in request: " << e.what() << std::endl;
+            throw;
         }
         natsMsg_Destroy(replyMsg);
     }
 
-    // Reply to a request message
-    void reply(const std::string& subject, natsMsgHandler onRequest, void* closure = nullptr) {
+    // Reply to a request message with flexible callback handling using std::function
+    void repBus(const std::string& subject, std::function<void(natsMsg*)> onRequest, void* closure = nullptr) {
         natsSubscription* sub = nullptr;
-        natsStatus s = natsConnection_Subscribe(&(sub), bus.getConnection(), subject.c_str(), onRequest, closure);
+        auto wrapper = [](natsConnection* nc, natsSubscription* sub, natsMsg* msg, void* closure) {
+            auto* handler = static_cast<std::function<void(natsMsg*)>*>(closure);
+            (*handler)(msg);
+        };
+
+        natsStatus s = natsConnection_Subscribe(&(sub), bus.getConnection(), subject.c_str(), wrapper, &onRequest);
         if (s == NATS_OK) {
             std::cout << "Listening for requests on subject: " << subject << std::endl;
         } else {

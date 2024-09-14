@@ -9,16 +9,18 @@
 class Boot : NatsBase{
 public:
     explicit Boot() {
-        publish("boot", "Boot is created.");
-        publish("boot", "Boot is initialized.");
+        pubBus("boot", "Boot is created.");
+        pubBus("boot", "Boot is initialized.");
     }
     ~Boot() {
-        publish("boot", "Boot is destroyed.");
+        pubBus("boot", "Boot is destroyed.");
     }
 
     int start() {
-        publish("boot", "Boot is starting.");
-
+        pubBus("boot", "Boot is starting.");
+        reqBus("boot.company.details", "company.details", [](const std::string& reply) {
+            std::cout << "Received reply: " << reply << std::endl;
+        });
         return 0;
     }
 };
