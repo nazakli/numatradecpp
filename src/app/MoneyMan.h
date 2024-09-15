@@ -4,5 +4,7 @@
 
 #ifndef MONEYMAN_H
 #define MONEYMAN_H
+class MoneyMan {
 
+};
 #endif //MONEYMAN_H
