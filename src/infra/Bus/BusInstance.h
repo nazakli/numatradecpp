@@ -2,8 +2,6 @@
 // Created by Numan on 15.09.2024.
 //
 
-#ifndef BUS_H
-#define BUS_H
 #ifndef BUS_INSTANCE_H
 #define BUS_INSTANCE_H
 

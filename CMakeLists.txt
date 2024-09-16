@@ -17,16 +17,30 @@ add_executable(numatrade main.cpp
         src/infra/Bus/BusRequester.h
         src/infra/Bus/BusReplier.h
         src/app/AdminMan.h
+        src/infra/Frappe/FrappeInstance.h
+        src/infra/Frappe/FrappeGet.h
+        src/infra/Frappe/FrappePost.h
+        src/app/NotifMan.h
+        src/app/TradeMan.h
+        src/app/QuoteMan.h
+        src/infra/Data/Db.h
+        src/infra/Ipc/Ipc.h
+        src/infra/Ipc/IpcPub.h
+        src/infra/Ipc/IpcSub.h
+        src/infra/Ipc/IpcReq.h
+        src/infra/Ipc/IpcRep.h
 )
-find_package(nng)
+
 find_package(spdlog)
 find_package(glaze)
 find_package(cnats)
 find_package(SQLite3)
+find_package(cppzmq)
+
 
 
 target_link_libraries(numatrade
-        nng::nng
+        cppzmq
         spdlog::spdlog
         SQLite::SQLite3
         glaze::glaze
