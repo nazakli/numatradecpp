@@ -25,9 +25,8 @@ public:
     memcpy(zmq_message.data(), fullMessage.data(), fullMessage.size());
 
     // Mesajı non-blocking modda gönder (dontwait ile)
-    const zmq::send_result_t sent = socket.send(zmq_message, zmq::send_flags::dontwait);
-    if (sent) {
-      std::cout << "IPC PUB [" << channel << "]: " << message << std::endl;
+    if (const zmq::send_result_t sent = socket.send(zmq_message, zmq::send_flags::dontwait)) {
+      //std::cout << "IPC PUB [" << channel << "]: " << message << std::endl;
     } else {
       std::cerr << "Mesaj gönderilemedi (non-blocking modda)." << std::endl;
     }

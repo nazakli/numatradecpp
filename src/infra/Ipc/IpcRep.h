@@ -29,7 +29,7 @@ public:
 
             while (true) {
                 // Non-blocking modda istekleri dinle (yanıt gelene kadar bloklama yok)
-                zmq::poll(items, 1, -1);  // -1 ile süresiz bekle
+                zmq::poll(items, 1,std::chrono::milliseconds(-1));  // -1 ile süresiz bekle
 
                 if (items[0].revents & ZMQ_POLLIN) {
                     zmq::message_t request;

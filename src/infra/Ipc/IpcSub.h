@@ -9,41 +9,39 @@
 #include <utility>
 #include <zmq.hpp>
 #include "Ipc.h"
+#include <thread>
+#include <iostream>
 
 class IpcSub {
 public:
-  // Constructor: ZeroMQ context'i singleton'dan alıyor ve dinamik kanala abone oluyor
   IpcSub(const std::string& channel, std::function<void(const std::string&)> callback)
       : socket(Ipc::getInstance(), ZMQ_SUB), callback(std::move(callback)) {
-    // inproc üzerinden "ipc_pubsub" adresine bağlan
-    socket.connect("inproc://ipc_pubsub");
-
-    // Belirli bir kanala abone ol (dinamik kanal ismi)
-    socket.set(zmq::sockopt::subscribe, channel);
+    socket.connect("inproc://ipc_pubsub");  // Kanal ismi ile bağlan
+    socket.set(zmq::sockopt::subscribe, channel);  // Kanal abonesi ol
   }
 
-  // Mesaj dinleme ve callback'i çalıştırma (CPU dostu blocking mod)
+  // Dinleme fonksiyonunu başlat
   void listen() {
-    zmq::pollitem_t items[] = { { static_cast<void*>(socket), 0, ZMQ_POLLIN, 0 } };
+    std::thread([this]() {
+        zmq::pollitem_t items[] = { { static_cast<void*>(socket), 0, ZMQ_POLLIN, 0 } };
 
-    while (true) {
-      // CPU dostu blocking poll - süresiz bekleme
-      zmq::poll(items, 1, -1);  // -1 ile süresiz bekle, mesaj gelir gelmez tetiklenir
+        // Süresiz mesaj dinleme döngüsü
+        while (true) {
+            zmq::poll(items,1, std::chrono::milliseconds(-1));  // Mesaj gelene kadar bekler
 
-      // Eğer bir mesaj varsa
-      if (items[0].revents & ZMQ_POLLIN) {
-        zmq::message_t message;
-        socket.recv(message, zmq::recv_flags::none);  // Mesajı al
-        std::string receivedMessage(static_cast<char*>(message.data()), message.size());
-
-        // Callback fonksiyonunu çalıştır
-        callback(receivedMessage);
-      }
-    }
+            // Mesaj geldiğinde
+            if (items[0].revents & ZMQ_POLLIN) {
+                zmq::message_t message;
+                socket.recv(message, zmq::recv_flags::none);  // Mesajı al
+                std::string msg(static_cast<char*>(message.data()), message.size());
+                callback(msg);  // Callback fonksiyonunu çalıştır
+            }
+        }
+    }).detach();  // Thread'i detach ederek çalıştır
   }
 
 private:
-  zmq::socket_t socket;    // ZeroMQ subscriber socket
-  std::function<void(const std::string&)> callback; // Dinamik callback fonksiyonu
+  zmq::socket_t socket;  // ZeroMQ socket
+  std::function<void(const std::string&)> callback;  // Mesaj geldiğinde çalışacak callback
 };
 #endif //IPCSUB_H

@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.29)
 project(numatrade)
 
 set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_executable(numatrade main.cpp
         src/core/entity/Client.h
@@ -29,19 +30,19 @@ add_executable(numatrade main.cpp
         src/infra/Ipc/IpcSub.h
         src/infra/Ipc/IpcReq.h
         src/infra/Ipc/IpcRep.h
+        src/core/DataTree.h
+        src/core/entity/Entity.h
 )
 
-find_package(spdlog)
+
+find_package(cppzmq)
+find_package(SQLite3)
 find_package(glaze)
 find_package(cnats)
-find_package(SQLite3)
-find_package(cppzmq)
-
 
 
 target_link_libraries(numatrade
         cppzmq
-        spdlog::spdlog
         SQLite::SQLite3
         glaze::glaze
         cnats::nats_static)

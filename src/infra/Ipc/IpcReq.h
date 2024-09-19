@@ -42,13 +42,13 @@ public:
 
             // Sürekli yanıtları dinle (timeout'suz, yanıt gelene kadar süresiz bekler)
             while (true) {
-                zmq::poll(items, 1, -1);  // -1 ile süresiz bekle, yanıt gelir gelmez tetiklenir
+                zmq::poll(items, 1, std::chrono::milliseconds(-1));  // -1 ile süresiz bekle, yanıt gelir gelmez tetiklenir
 
                 // Eğer bir yanıt varsa
                 if (items[0].revents & ZMQ_POLLIN) {
                     zmq::message_t reply;
-                    socket.recv(reply, zmq::recv_flags::none);  // Mesajı al
-                    std::string replyMessage(static_cast<char*>(reply.data()), reply.size());
+                    const zmq::recv_result_t result = socket.recv(reply, zmq::recv_flags::none);  // Mesajı al
+                    const std::string replyMessage(static_cast<char*>(reply.data()), reply.size());
 
                     // Callback fonksiyonunu çalıştır
                     callback(replyMessage);

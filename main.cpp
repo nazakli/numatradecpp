@@ -2,24 +2,40 @@
 #include "src/app/QuoteMan.h"
 #include "src/app/TradeMan.h"
 
+
 int main() {
-    // QuoteMan ve TradeMan nesnelerini oluşturuyoruz
+
+    /*
+    const int messageCount = 125000;  // Gönderilecek mesaj sayısı
+    std::atomic<int> publishedCount = 0;  // Gönderilen mesajların sayısı
+    std::atomic<int> receivedCount = 0;  // Alınan mesajların sayısı
+
     QuoteMan quoteMan;
     TradeMan tradeMan;
 
-    // TradeMan kotasyonları dinlemeye başlar
-    tradeMan.startListening();
-    tradeMan.startProcessing();
 
-    // QuoteMan kotasyon üretimine başlar
-    quoteMan.startPublishing();
 
-    // Bir süre kotasyon üretimi ve işlenmesine devam edelim (örneğin 10 saniye)
+    // TradeMan önce mesajları dinlemeye başlasın
+    std::thread subscriberThread([&]() {
+        tradeMan.startProcessing(messageCount, receivedCount);
+    });
+
+    // QuoteMan mesajları göndermeye başlasın
+    std::thread publisherThread([&]() {
+        quoteMan.startPublishing(messageCount, publishedCount);
+    });
+
+    // Thread'lerin bitmesini bekle
+    publisherThread.join();
+    subscriberThread.join();
+    */
+
+
     std::this_thread::sleep_for(std::chrono::seconds(1000));
 
     // TradeMan ve QuoteMan durdurulur
-    quoteMan.stopPublishing();
-    tradeMan.stop();
+    //quoteMan.stopPublishing();
+    //tradeMan.stop();
 
     return 0;
 }

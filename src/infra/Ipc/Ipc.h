@@ -1,25 +1,24 @@
-//
-// Created by Numan on 16.09.2024.
-//
-
 #ifndef IPC_H
 #define IPC_H
+
 #include <zmq.hpp>
 
-// Singleton ZeroMQ Context sınıfı
 class Ipc {
 public:
-  // Ipc sınıfının tek örneğini alır
-  static   zmq::context_t& getInstance() {
-    static zmq::context_t instance(3); // 3 thread'li context
-    return instance;
+  // Singleton context oluşturucu
+  static zmq::context_t& getInstance() {
+    static zmq::context_t context(1);  // Tek thread'li ZeroMQ context
+    return context;
   }
 
-  // Kopyalanabilir ve taşınabilir olmasını engelle
+private:
+  // Constructor private yapılır, böylece dışarıdan instance oluşturulamaz
+  Ipc() = default;
+  ~Ipc() = default;
+
+  // Copy constructor ve assignment operator devre dışı bırakılır
   Ipc(const Ipc&) = delete;
   Ipc& operator=(const Ipc&) = delete;
-
-private:
-  Ipc() = default; // Özel yapıcı
 };
-#endif //IPC_H
+
+#endif // IPC_H
