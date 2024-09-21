@@ -1,0 +1,10 @@
+# This file is managed by Conan, contents will be overwritten.
+# To keep your changes, remove these comment lines, but the plugin won't be able to modify your requirements
+
+requirements:
+  - "libcurl/8.10.0"
+  - "spdlog/1.14.1"
+  - "cppzmq/4.10.0"
+  - "glaze/3.3.4"
+  - "sqlite3/3.46.1"
+  - "cnats/3.8.2"

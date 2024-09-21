@@ -6,13 +6,14 @@
 #define COMPANY_H
 #include  <string>
 
-#include "Client.h"
-#include "Instrument.h"
+#include "Entity.h"
+#include "../../infra/Data/Db.h"
 
-struct Company{
+struct Company : Entity{
   std::string code;
-  std::string name;
-  Instrument currency;
-  std::vector<Client> clients;
+  Company(const uint64_t id, std::string code):
+    Entity(id, "company"), code(std::move(code)) {
+    db.executeSQL("REPLACE INTO "+ tableName + " (id, code) VALUES (" + std::to_string(id) + ", '" + code + "')");
+  }
 };
 #endif //COMPANY_H

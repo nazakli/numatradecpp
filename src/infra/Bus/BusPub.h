@@ -1,16 +1,14 @@
-#ifndef BUS_PUBLISHER_H
-#define BUS_PUBLISHER_H
+#ifndef BUS_PUB_H
+#define BUS_PUB_H
 
 #include "BusInstance.h"
 #include <queue>
 #include <thread>
-#include <mutex>
 #include <condition_variable>
 #include <atomic>
 #include <string>
 
-class BusPublisher {
-private:
+class BusPub {
     std::queue<std::string> messageQueue;
     std::mutex queueMutex;
     std::condition_variable cv;
@@ -18,11 +16,11 @@ private:
     std::thread publisherThread;
 
 public:
-    BusPublisher() : stopFlag(false) {
-        publisherThread = std::thread(&BusPublisher::processQueue, this);
+    BusPub() : stopFlag(false) {
+        publisherThread = std::thread(&BusPub::processQueue, this);
     }
 
-    ~BusPublisher() {
+    ~BusPub() {
         stopFlag = true;
         cv.notify_all();
         if (publisherThread.joinable()) {
@@ -32,13 +30,13 @@ public:
 
     void publish(const std::string& subject, const std::string& message) {
         std::lock_guard<std::mutex> lock(queueMutex);
-        messageQueue.push(subject + ":" + message);
+        messageQueue.push(subject + "|" + message);
         cv.notify_one();
     }
 
 private:
     void processQueue() {
-        BusInstance* busInstance = BusInstance::getInstance();
+        const BusInstance* busInstance = BusInstance::getInstance();
 
         while (!stopFlag) {
             std::unique_lock<std::mutex> lock(queueMutex);
@@ -48,12 +46,12 @@ private:
                 messageQueue.pop();
                 lock.unlock();
 
-                std::string subject = message.substr(0, message.find(":"));
-                std::string content = message.substr(message.find(":") + 1);
+                std::string subject = message.substr(0, message.find("|"));
+                std::string content = message.substr(message.find("|") + 1);
                 natsConnection_PublishString(busInstance->getConnection(), subject.c_str(), content.c_str());
             }
         }
     }
 };
 
-#endif // BUS_PUBLISHER_H
+#endif // BUS_PUB_H

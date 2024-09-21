@@ -6,26 +6,34 @@
 #define BASE_H
 #include <unordered_map>
 #include <string>
-#include <iostream>
-#include <glaze/glaze.hpp>
+
+
+class Db;
 
 class Entity {
+protected:
+  std::string tableName;  // Türetilen sınıflar için tablo adı
+  Db& db = Db::getInstance();  // Her Entity için tek bir DB instance
+
 public:
-  unsigned long long id;
+   int64_t id;
 
   // Constructor
-  explicit Entity(unsigned long long id = 0) : id(id) {}
+  explicit Entity(unsigned long long id = 0, std::string  tableName = "")
+      : id(id), tableName(std::move(tableName)) {}
 
-  // CRUD İşlemleri
-  virtual bool create() = 0;
-  virtual std::unordered_map<std::string, std::string> read() = 0;
-  virtual bool update() = 0;
+  // CRUD işlemleri virtual olarak tanımlandı
+  virtual bool create(const std::unordered_map<std::string, std::string>& data) = 0;
+  virtual std::unordered_map<std::string, std::string> read(unsigned long long id) = 0;
+  virtual bool update(const std::unordered_map<std::string, std::string>& data) = 0;
   virtual bool deleteEntity() = 0;
 
-  // toJson ve toPrint fonksiyonları
+  // toJson ve toPrint fonksiyonları virtual olarak tanımlandı
   [[nodiscard]] virtual std::string toJson() const = 0;
   virtual void toPrint() const = 0;
 
   // Destructor
   virtual ~Entity() = default;
-};#endif //BASE_H
+};
+
+#endif //BASE_H

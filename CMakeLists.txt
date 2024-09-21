@@ -13,14 +13,12 @@ add_executable(numatrade main.cpp
         src/core/entity/Instrument.h
         src/core/entity/Position.h
         src/infra/Bus/BusInstance.h
-        src/infra/Bus/BusPublisher.h
-        src/infra/Bus/BusSubscriber.h
-        src/infra/Bus/BusRequester.h
-        src/infra/Bus/BusReplier.h
+        src/infra/Bus/BusPub.h
+        src/infra/Bus/BusSub.h
+        src/infra/Bus/BusReq.h
+        src/infra/Bus/BusRep.h
         src/app/AdminMan.h
         src/infra/Frappe/FrappeInstance.h
-        src/infra/Frappe/FrappeGet.h
-        src/infra/Frappe/FrappePost.h
         src/app/NotifMan.h
         src/app/TradeMan.h
         src/app/QuoteMan.h
@@ -32,6 +30,10 @@ add_executable(numatrade main.cpp
         src/infra/Ipc/IpcRep.h
         src/core/DataTree.h
         src/core/entity/Entity.h
+        src/infra/Data/DbSeed.h
+        src/infra/Log/Log.h
+        src/infra/Bus/BusJetPub.h
+        src/infra/Bus/BusJetSub.h
 )
 
 
@@ -39,10 +41,16 @@ find_package(cppzmq)
 find_package(SQLite3)
 find_package(glaze)
 find_package(cnats)
+find_package(spdlog)
+find_package(CURL)
+
+
 
 
 target_link_libraries(numatrade
         cppzmq
+        CURL::libcurl
+        spdlog::spdlog
         SQLite::SQLite3
         glaze::glaze
         cnats::nats_static)

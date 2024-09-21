@@ -1,31 +1,29 @@
 #ifndef BUS_REQUESTER_H
 #define BUS_REQUESTER_H
 
-#include "BusInstance.h"
-#include <string>
 #include <iostream>
-#include <thread>
-#include <atomic>
+#include <string>
+#include <utility>
 
-class BusRequester {
+#include "BusInstance.h"
+
+class BusReq {
 private:
     std::string subject;
 
 public:
-    // Constructor, istek yapılacak kanalı alır
-    BusRequester(const std::string& subject) : subject(subject) {}
+    explicit BusReq(std::string  subject) : subject(std::move(subject)) {}
 
-    // İstek gönderme fonksiyonu (non-blocking)
+
     void request(const std::string& message, void (*callback)(natsConnection*, natsMsg*, void*)) {
         BusInstance* busInstance = BusInstance::getInstance();
         natsConnection* conn = busInstance->getConnection();
 
-        // Asenkron istek gönderiliyor
         natsConnection_PublishRequestString(conn, subject.c_str(), message.c_str(), callback, nullptr);
         std::cout << "Request sent to subject: " << subject << " - Message: " << message << std::endl;
     }
 
-    ~BusRequester() {
+    ~BusReq() {
         std::cout << "BusRequester for subject: " << subject << " destroyed" << std::endl;
     }
 };
